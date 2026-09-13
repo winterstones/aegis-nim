@@ -44,11 +44,11 @@ class NeMoGatekeeper:
         """Évalue la dangerosité de l'action contre les règles NeMo et applique la dégradation gracieuse sur Tier-0."""
         if target_node.is_crown_jewel() and action.is_destructive():
             reaction = ProposedAction(
-                action_type= ActionType.QUARANTINE_PORT,
-                target_node_id = action.target_node_id,
-                parameters = {"port": action.parameters.get("port", 3306), "mitigation": "graceful_degradation"},
-                justification = "Action destructive bloquée par NeMo Guardrails (Tier-0). Confinement réseau passif appliqué.",
-                status = ActionStatus.DEGRADED
+                action_type=ActionType.QUARANTINE_PORT,
+                target_node_id=action.target_node_id,
+                parameters={"port": action.parameters.get("port", 3306), "mitigation": "graceful_degradation"},
+                justification="Action destructive bloquée par NeMo Guardrails (Tier-0). Confinement réseau passif appliqué.",
+                status=ActionStatus.DEGRADED,
             )
             return (ActionStatus.PENDING_HITL, reaction)
 
