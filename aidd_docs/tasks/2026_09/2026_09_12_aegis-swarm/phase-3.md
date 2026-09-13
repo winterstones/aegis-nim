@@ -1,5 +1,5 @@
-﻿---
-status: pending
+---
+status: done
 ---
 
 # Instruction: Phase 3 - Client NVIDIA NIM & Stratège de Corrélation
