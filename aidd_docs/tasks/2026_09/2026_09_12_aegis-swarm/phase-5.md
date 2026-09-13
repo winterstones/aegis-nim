@@ -1,5 +1,5 @@
-﻿---
-status: pending
+---
+status: done
 ---
 
 # Instruction: Phase 5 - Orchestrateur Swarm, Simulateur & Console SOC
