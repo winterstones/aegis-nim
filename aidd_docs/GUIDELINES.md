@@ -10,6 +10,7 @@ How this team drives AI coding assistants on this project.
 - **Protection Anti-Injection:** Les logs et charges utiles de télémétrie sont systématiquement soumis aux Input Rails de NeMo Guardrails pour neutraliser les attaques par injection de prompt indirecte.
 - **Découplage Stratégie / Exécution:** Le cerveau Nemotron 70B propose des stratégies; seul le composant Gatekeeper (NeMo Guardrails déterministe) autorise ou bloque leur exécution sur la flotte.
 - **Séparation stricte AIDD vs NeMo Guardrails:** AIDD opère exclusivement au *dev-time* (workflow IDE, compétences de dev, revue). NeMo Guardrails opère exclusivement au *runtime* Python (`nemoguardrails`, Colang). Aucun code AIDD n'est importé en production ni n'altère le comportement de NeMo. L'apprentissage de NeMo Guardrails reste pur et direct.
+- **Traçabilité des contributions (Git Metadata) :** Les commits générés par l'IA portent les trailers `Generated-by: Antigravity AI` et `Co-authored-by: Antigravity <ai@antigravity>`. Les commits issus de ton codage direct restent signés uniquement par toi.
 
 ## Validation depth
 

@@ -1,5 +1,5 @@
-﻿---
-status: pending
+---
+status: done
 ---
 
 # Instruction: Phase 2 - Gestionnaire de Flotte & Télémétrie

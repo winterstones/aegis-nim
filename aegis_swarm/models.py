@@ -59,10 +59,7 @@ class Node(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
     def is_crown_jewel(self) -> bool:
-        """
-        TODO (Votre tour de coder) :
-        Retourne True si le nœud appartient au Tier-0 (Crown Jewel), False sinon.
-        """
+        """Retourne True si le nœud appartient au Tier-0 (Crown Jewel), False sinon."""
         return self.tier == NodeTier.TIER_0
 
 class TelemetryEvent(BaseModel):
@@ -90,11 +87,7 @@ class ProposedAction(BaseModel):
     status: ActionStatus = ActionStatus.PROPOSED
 
     def is_destructive(self) -> bool:
-        """
-        TODO (Votre tour de coder) :
-        Retourne True si l'action est considérée comme destructive (ex: ISOLATE_NODE),
-        False s'il s'agit d'une dégradation ciblée (ex: BLOCK_IP ou QUARANTINE_PORT).
-        """
+        """Retourne True si l'action est considérée comme destructive (ex: ISOLATE_NODE)."""
         return self.action_type == ActionType.ISOLATE_NODE
 
 
@@ -107,12 +100,7 @@ class SwarmStrategy(BaseModel):
     actions: List[ProposedAction] = Field(default_factory=list)
 
     def has_critical_actions(self) -> bool:
-        """
-        TODO (Votre tour de coder) :
-        Retourne True si au moins une des actions proposées dans la stratégie
-        est destructive (utilise ProposedAction.is_destructive()).
-        """
-        # --- VOTRE CODE ICI ---
+        """Retourne True si au moins une des actions proposées est destructive."""
         for action in self.actions:
             if action.is_destructive():
                 return True
