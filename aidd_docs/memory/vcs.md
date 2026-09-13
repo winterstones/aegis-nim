@@ -19,6 +19,9 @@ The version-control conventions this project follows: branches, commits, and the
 - Convention: Conventional Commits
 - Format: `type(scope): description`
 - Examples: `feat(brain): add nemotron correlation prompt`, `fix(guardrails): block crown jewel reboot`
+- **Traçabilité IA / Humain (Git Trailers) :**
+  - Code généré ou commité par l'assistant : inclut le trailer `Generated-by: Antigravity AI` et `Co-authored-by: Antigravity <ai@antigravity>`.
+  - Code implémenté directement par l'humain : signé uniquement par l'auteur `winterstone` (sans mention IA).
 
 ## Commit Strategy
 

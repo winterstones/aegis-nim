@@ -1,0 +1,22 @@
+﻿# ==============================================================================
+# Colang Rules for Aegis-Swarm (Sovereign Swarm Defense)
+# ==============================================================================
+
+# Input Rail: Neutraliser les injections de prompt dissimulées dans les logs
+define flow check prompt injection
+  user said something
+  $is_injection = execute check_injection_in_payload(payload=$last_user_message)
+  if $is_injection
+    bot say "ALERTE: Injection de prompt indirecte détectée dans la télémétrie. Log neutralisé."
+    stop
+
+# Action Rail: Protection stricte des ressources Tier-0 (Crown Jewels)
+define flow protect crown jewels tier 0
+  $is_tier_0 = execute is_node_tier_0(node_id=$target_node_id)
+  $is_destructive = execute is_action_destructive(action_type=$action_type)
+
+  if $is_tier_0 and $is_destructive
+    bot say "BLOCAGE: Action destructrice interdite sur un nœud critique Tier-0 sans validation humaine."
+    execute trigger_graceful_degradation(target_node_id=$target_node_id)
+    execute wait_for_hitl_approval(target_node_id=$target_node_id, timeout=30)
+    stop
