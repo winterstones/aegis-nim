@@ -35,6 +35,7 @@ def display_fleet_table(orchestrator: AegisSwarmOrchestrator, title: str = "Éta
     table.add_column("Rôle")
     table.add_column("Tier de Criticité")
     table.add_column("Statut", justify="center")
+    table.add_column("Actionneur", style="cyan")
     table.add_column("Ports / IPs Bloqués")
 
     for node_inst in orchestrator.fleet_manager.nodes.values():
@@ -49,12 +50,23 @@ def display_fleet_table(orchestrator: AegisSwarmOrchestrator, title: str = "Éta
         tier_style = "bold red" if node_inst.tier.value == "tier_0" else "blue"
         blocks = f"IPs: {node_inst.blocked_ips} | Ports: {node_inst.quarantined_ports}"
 
+        act_name = "SIMULÉ"
+        if hasattr(node_inst, "actuator"):
+            from aegis_swarm.fleet.actuators.local_os import LocalOSActuator
+            from aegis_swarm.fleet.actuators.agent_actuator import AgentActuator
+            if isinstance(node_inst.actuator, LocalOSActuator):
+                dry = " [DRY]" if node_inst.actuator.dry_run else " [LIVE]"
+                act_name = f"OS-{node_inst.actuator.system.upper()}{dry}"
+            elif isinstance(node_inst.actuator, AgentActuator):
+                act_name = f"AGENT-HTTP"
+
         table.add_row(
             node_inst.id,
             node_inst.name,
             node_inst.node.role.value,
             f"[{tier_style}]{node_inst.tier.value.upper()}[/{tier_style}]",
             f"[{status_style}]{node_inst.status.value.upper()}[/{status_style}]",
+            f"[cyan]{act_name}[/cyan]",
             blocks,
         )
     console.print(table)

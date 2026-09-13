@@ -1,4 +1,4 @@
-﻿# Coding Assertions
+# Coding Assertions
 
 The checks that must pass for code to count as done. Minimal, run after every change.
 
@@ -18,7 +18,7 @@ The heavier gate.
 | Order | Command | Checks |
 | ----- | ------- | ------ |
 | 1 | `pytest tests/` | Tests unitaires flotte & guardrails |
-| 2 | `python simulate_fleet_attack.py --dry-run` | Validation sans échec du scénario de démonstration |
+| 2 | `python simulate_fleet_attack.py --fast` | Validation sans échec du scénario de démonstration |
 
 ## Behavior
 

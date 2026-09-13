@@ -1,4 +1,4 @@
-﻿"""Unit tests for aegis_swarm.fleet."""
+"""Unit tests for aegis_swarm.fleet."""
 
 import pytest
 from aegis_swarm.models import (
@@ -75,3 +75,66 @@ def test_fleet_manager_bootstrap_and_dispatch():
         justification="Fail test",
     )
     assert manager.dispatch_action(bad_action) is False
+
+
+def test_fleet_manager_register_physical_node():
+    from aegis_swarm.fleet.actuators.local_os import LocalOSActuator
+    from aegis_swarm.fleet.actuators.agent_actuator import AgentActuator
+
+    manager = FleetManager()
+
+    # 1. Local OS actuator registration
+    inst_local = manager.register_physical_node(
+        node_id="node-local-host",
+        name="my-laptop",
+        ip="127.0.0.1",
+        role=NodeRole.WORKSTATION,
+        tier=NodeTier.TIER_2,
+        actuator_type="local",
+        dry_run=True,
+    )
+    assert inst_local.id == "node-local-host"
+    assert inst_local.node.metadata["physical"] is True
+    assert isinstance(inst_local.actuator, LocalOSActuator)
+    assert inst_local.actuator.dry_run is True
+    assert manager.get_node("node-local-host") is inst_local
+
+    # 2. Agent actuator registration
+    inst_agent = manager.register_physical_node(
+        node_id="node-edge-linux",
+        name="asus-pn40",
+        ip="192.168.1.105",
+        role=NodeRole.DMZ_WEB,
+        tier=NodeTier.TIER_1,
+        actuator_type="agent",
+        agent_url="http://192.168.1.105:8443",
+        agent_token="my-token",
+    )
+    assert inst_agent.id == "node-edge-linux"
+    assert isinstance(inst_agent.actuator, AgentActuator)
+    assert inst_agent.actuator.agent_url == "http://192.168.1.105:8443"
+    assert inst_agent.actuator.token == "my-token"
+
+
+def test_fleet_manager_get_node_by_name():
+    manager = FleetManager()
+    node = Node(
+        id="id-srv-1",
+        name="host-datacenter-01",
+        ip="10.0.0.10",
+        role=NodeRole.DB_CORE,
+        tier=NodeTier.TIER_0,
+    )
+    manager.register_node(NodeInstance(node))
+
+    # Lookup by ID
+    assert manager.get_node("id-srv-1") is not None
+    assert manager.get_node("id-srv-1").name == "host-datacenter-01"
+
+    # Lookup by Name
+    assert manager.get_node("host-datacenter-01") is not None
+    assert manager.get_node("host-datacenter-01").id == "id-srv-1"
+
+    # Non-existent
+    assert manager.get_node("non-existent") is None
+

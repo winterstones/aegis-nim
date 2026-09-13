@@ -16,13 +16,19 @@ from aegis_swarm.models import (
 )
 
 
+from aegis_swarm.fleet.actuators.base import BaseActuator, ExecutionResult
+from aegis_swarm.fleet.actuators.simulated import SimulatedActuator
+
+
 class NodeInstance:
-    def __init__(self, node: Node):
+    def __init__(self, node: Node, actuator: Optional[BaseActuator] = None):
         self.node = node
+        self.actuator = actuator or SimulatedActuator()
         self.events: List[TelemetryEvent] = []
         self.blocked_ips: List[str] = []
         self.quarantined_ports: List[int] = []
         self.active_processes: List[str] = ["systemd", "sshd"]
+        self.last_result: Optional[ExecutionResult] = None
 
     @property
     def id(self) -> str:
@@ -41,27 +47,27 @@ class NodeInstance:
         return self.node.status
 
     def apply_action(self, action: ProposedAction) -> bool:
-        """Applique une action défensive sur le nœud et met à jour son état."""
-        if action.action_type == ActionType.ISOLATE_NODE:
-            self.node.status = NodeStatus.ISOLATED
-            return True
+        """Applique une action défensive sur le nœud via son actionneur dédié."""
+        # Suivi local des paramètres
+        if action.action_type == ActionType.BLOCK_IP:
+            ip = action.parameters.get("ip")
+            if ip and ip not in self.blocked_ips:
+                self.blocked_ips.append(ip)
         elif action.action_type == ActionType.QUARANTINE_PORT:
             port = action.parameters.get("port")
-            if port:
+            if port and port not in self.quarantined_ports:
                 self.quarantined_ports.append(port)
-            self.node.status = NodeStatus.QUARANTINED
-            return True
-        elif action.action_type == ActionType.BLOCK_IP:
-            ip = action.parameters.get("ip")
-            if ip:
-                self.blocked_ips.append(ip)
-            return True
         elif action.action_type == ActionType.KILL_PROCESS:
-            process = action.parameters.get("process_name")
-            if process and process in self.active_processes:
-                self.active_processes.remove(process)
-            return True
-        return False
+            proc = action.parameters.get("process_name")
+            if proc and proc in self.active_processes:
+                self.active_processes.remove(proc)
+
+        # Délégation à l'actionneur (Simulé, OS Local, ou Micro-Agent distant)
+        res = self.actuator.apply_action(action, self.node)
+        self.last_result = res
+        if res.success and action.action_type == ActionType.UN_ISOLATE_NODE:
+            self.node.status = NodeStatus.HEALTHY
+        return res.success
 
     def simulate_compromise(self, attacker_ip: str, payload: str, description: str) -> SecurityAlert:
         """Simule une compromission ou anomalie sur le nœud et génère une alerte."""
