@@ -1,5 +1,5 @@
-﻿---
-status: pending
+---
+status: done
 ---
 
 # Instruction: Phase 4 - Moteur NeMo Guardrails & Gatekeeper Colang

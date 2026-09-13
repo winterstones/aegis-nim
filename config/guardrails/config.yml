@@ -1,0 +1,15 @@
+﻿# NeMo Guardrails Configuration for Aegis-Swarm
+models:
+  - type: main
+    engine: openai
+    model: nvidia/llama-3.1-nemotron-70b-instruct
+    parameters:
+      base_url: "https://integrate.api.nvidia.com/v1"
+
+rails:
+  input:
+    flows:
+      - check prompt injection
+  action:
+    flows:
+      - protect crown jewels tier 0
