@@ -47,7 +47,9 @@ flowchart TD
 
 ## Key decisions
 
-- **Découplage Stratégie / Autorisation :** Le LLM (Nemotron 70B) propose la stratégie de défense, mais n'a aucun pouvoir direct d'exécution sur le système. C'est NeMo Guardrails qui a force exécutoire.
+- **Découplage Stratégie / Autorisation :** Le LLM propose la stratégie de défense, mais n'a aucun pouvoir direct d'exécution sur le système. C'est NeMo Guardrails qui a force exécutoire.
+- **Actionneurs Pluggables (`actuators/`) :** Les nœuds peuvent être émulés en mémoire (`SimulatedActuator`), réels sur la machine hôte (`LocalOSActuator`), ou pilotés à distance sur des serveurs physiques (`AgentActuator`).
+- **Micro-Agent Autonome Multi-OS (`aegis_agent/daemon.py`) :** Zéro dépendance externe (lib standard Python), s'exécute sous Windows (`netsh`, `taskkill`) et Linux (`iptables`, `pkill`) pour traduire les ordres de défense en actions natives du système hôte.
 - **Format universel OpenAI NIM :** Facilite la portabilité immédiate entre le bac à sable cloud NVIDIA (`build.nvidia.com`) et les appliances HPE sur site.
 - **Immunité aux injections indirectes :** Les logs d'attaquants sont traités comme des données non fiables via un Input Rail NeMo avant soumission au LLM.
 - **Orthogonalité AIDD vs NeMo Guardrails :** AIDD régit uniquement le workflow d'ingénierie et l'assistance de code (fichiers markdown dans `.agents/` et `aidd_docs/`). NeMo Guardrails est la brique applicative Python (`nemoguardrails`, Colang `.co`) exécutée au runtime. Zéro interférence, zéro couplage.

@@ -20,9 +20,14 @@ class FleetManager:
         """Enregistre un nœud dans l'inventaire de la flotte."""
         self.nodes[node_instance.id] = node_instance
 
-    def get_node(self, node_id: str) -> Optional[NodeInstance]:
-        """Récupère un nœud par son identifiant unique."""
-        return self.nodes.get(node_id)
+    def get_node(self, node_id_or_name: str) -> Optional[NodeInstance]:
+        """Récupère un nœud par son identifiant unique ou par son nom réseau."""
+        if node_id_or_name in self.nodes:
+            return self.nodes[node_id_or_name]
+        for node in self.nodes.values():
+            if node.name == node_id_or_name:
+                return node
+        return None
 
     def dispatch_action(self, action: ProposedAction) -> bool:
         """Achemine et exécute une action sur le nœud cible spécifié."""
@@ -37,6 +42,39 @@ class FleetManager:
     def get_fleet_summary(self) -> Dict[str, str]:
         """Retourne un résumé clé-valeur de l'état de chaque nœud."""
         return {node.name: node.status.value for node in self.nodes.values()}
+
+    def register_physical_node(
+        self,
+        node_id: str,
+        name: str,
+        ip: str,
+        role: NodeRole,
+        tier: NodeTier,
+        actuator_type: str = "agent",
+        agent_url: Optional[str] = None,
+        agent_token: str = "aegis-sovereign-token",
+        dry_run: bool = False,
+    ) -> NodeInstance:
+        """Enregistre un ordinateur ou serveur physique réel dans la flotte."""
+        node = Node(
+            id=node_id,
+            name=name,
+            ip=ip,
+            role=role,
+            tier=tier,
+            status=NodeStatus.HEALTHY,
+            metadata={"actuator_type": actuator_type, "physical": True},
+        )
+        if actuator_type == "local":
+            from aegis_swarm.fleet.actuators.local_os import LocalOSActuator
+            actuator = LocalOSActuator(dry_run=dry_run)
+        else:
+            from aegis_swarm.fleet.actuators.agent_actuator import AgentActuator
+            actuator = AgentActuator(agent_url=agent_url or f"http://{ip}:8443", token=agent_token)
+
+        instance = NodeInstance(node, actuator=actuator)
+        self.register_node(instance)
+        return instance
 
     @classmethod
     def bootstrap_default_fleet(cls) -> "FleetManager":

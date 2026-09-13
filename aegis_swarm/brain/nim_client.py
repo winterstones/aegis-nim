@@ -1,4 +1,4 @@
-﻿"""Unified NVIDIA NIM client (OpenAI-compatible) with mock fallback."""
+"""Unified NVIDIA NIM client (OpenAI-compatible) with mock fallback."""
 
 import json
 from typing import Any, Dict, List, Optional
@@ -15,25 +15,38 @@ class NIMClient:
         self.model = model or settings.nim_model
         self.mock_mode = settings.mock_mode or (not self.api_key or self.api_key.startswith("mock") or self.api_key.startswith("nvapi-your"))
 
+        self.last_was_mock: bool = self.mock_mode
+
         if not self.mock_mode:
-            self.client = OpenAI(base_url=self.base_url, api_key=self.api_key)
+            self.client = OpenAI(base_url=self.base_url, api_key=self.api_key, timeout=30.0)
         else:
             self.client = None
 
-    def chat_completion(self, messages: List[Dict[str, str]], temperature: float = 0.1) -> str:
-        """Envoie une requête d'inférence à NVIDIA NIM ou génère un mock structuré."""
+    def chat_completion(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.1,
+        max_tokens: int = 1024,
+    ) -> str:
+        """Envoie une requête d'inférence à NVIDIA NIM ou bascule en mock structuré."""
         if not self.mock_mode and self.client:
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=messages,
                     temperature=temperature,
+                    max_tokens=max_tokens,
                 )
+                self.last_was_mock = False
                 return response.choices[0].message.content or "{}"
             except Exception as e:
-                # Fallback gracieux en cas de panne réseau au Hackathon
+                # Fallback gracieux avec notification en cas de panne réseau
+                import sys
+                print(f"[bold red]Avertissement NIM API :[/bold red] {e}", file=sys.stderr)
+                self.last_was_mock = True
                 return self._generate_mock_response(messages)
         else:
+            self.last_was_mock = True
             return self._generate_mock_response(messages)
 
     def _generate_mock_response(self, messages: List[Dict[str, str]]) -> str:

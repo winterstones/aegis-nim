@@ -1,4 +1,4 @@
-﻿# Codebase Map
+# Codebase Map
 
 The macro layout: the top-level areas and what each holds. A map to navigate, not the full tree.
 
@@ -23,13 +23,14 @@ flowchart TD
 ## Areas
 
 - `config/`: Paramètres globaux (`settings.py`), configuration NeMo Guardrails (`config.yml`), politiques d'action Colang (`swarm_rails.co`).
+- `aegis_agent/`: Micro-agent daemon HTTP autonome multi-OS (`daemon.py`) déployable sur serveurs physiques et postes de travail distants.
 - `aegis_swarm/`: Cœur du framework agentique de cyberdéfense.
   - `models.py`: Schémas typés Pydantic (Node, Alert, Telemetry, Action, SwarmStrategy).
-  - `fleet/`: Gestionnaire de nœuds (`fleet_manager.py`) et abstractions sondes/serveurs (`node.py`).
+  - `fleet/`: Gestionnaire de flotte (`fleet_manager.py`), instances nœuds (`node.py`) et actionneurs (`actuators/`: `SimulatedActuator`, `LocalOSActuator`, `AgentActuator`).
   - `brain/`: Client unifié NVIDIA NIM (`nim_client.py`) et moteur de corrélation multi-alertes (`strategist.py`).
   - `guardrails/`: Passerelle de validation NeMo Guardrails (`gatekeeper.py`).
   - `orchestrator.py`: Pipeline unifié Flotte -> Cerveau NIM -> Garde-fous -> Actuateurs.
-- `aidd_docs/`: Documentation et mémoire pérenne du projet AIDD.
+- `aidd_docs/`: Documentation, mémoire pérenne et historique des tâches AIDD.
 
 ## Entry points
 

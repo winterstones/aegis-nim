@@ -28,6 +28,7 @@ class NodeStatus(str, Enum):
 
 class ActionType(str, Enum):
     ISOLATE_NODE = "isolate_node"          # Destructif / arrêt total
+    UN_ISOLATE_NODE = "un_isolate"        # Déconfinement / rétablissement réseau
     BLOCK_IP = "block_ip"                  # Dégradation gracieuse / filtrage
     QUARANTINE_PORT = "quarantine_port"    # Dégradation gracieuse / restriction
     KILL_PROCESS = "kill_process"          # Ciblé
